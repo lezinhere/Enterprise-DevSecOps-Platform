@@ -21,6 +21,7 @@ The platform was designed and implemented to automate application build, securit
 \# Architecture Diagram
 
 
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/97d9f004-12a5-4593-939b-d0e0a289dc7e" />
 
 
 
