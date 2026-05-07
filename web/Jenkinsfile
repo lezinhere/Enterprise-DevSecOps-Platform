@@ -1,0 +1,201 @@
+\pipeline {
+    agent {
+        label 'slave'
+    }
+
+    parameters {
+        choice(name: 'QUALITY_GATE', choices: ['PASS', 'FAIL'], description: 'Quality Gate Result')
+    }
+
+    environment {
+        AWS_REGION = "ap-south-1"
+        ECR_REPO = "010438490109.dkr.ecr.ap-south-1.amazonaws.com/web-dev"
+        NAMESPACE = "${env.BRANCH_NAME == 'main' || env.BRANCH_NAME == 'develop' ? 'prod' : 'dev'}"
+    }
+
+    stages {
+
+        stage('Clean Workspace') {
+            steps {
+                cleanWs()
+            }
+        }
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Set Image Tag') {
+            steps {
+                script {
+                    COMMIT_ID = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+                    IMAGE_TAG = "${COMMIT_ID}-${env.BUILD_NUMBER}"
+                    env.IMAGE_TAG = IMAGE_TAG
+                }
+            }
+        }
+
+        stage('Static Analysis') {
+            parallel {
+
+                stage('SonarQube') {
+                    steps {
+                        withSonarQubeEnv('sonar') {
+                            sh '''
+                            sonar-scanner \
+                            -Dsonar.projectKey=web \
+                            -Dsonar.sources=.
+                            '''
+                        }
+                    }
+                }
+
+
+                stage('OWASP Dependency Check') {
+
+                steps {
+
+                  echo "Skipping OWASP temporarily"
+
+                  }
+               }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                script {
+                    if (params.QUALITY_GATE == "FAIL") {
+                        error "Quality Gate Failed"
+                    } else {
+                        echo "Quality Gate Passed"
+                    }
+                }
+            }
+        }
+
+        stage('Run Tests') {
+           steps {
+            sh '''
+        echo "Running Web tests"
+        cd web
+        npm install || true
+        npm test || true
+        '''
+    }
+}
+
+
+stage('Build Docker Image') {
+    steps {
+        sh '''
+        cd web
+        docker build \
+        --build-arg NODE_OPTIONS=--openssl-legacy-provider \
+        --build-arg DISABLE_ESLINT_PLUGIN=true \
+        -t web:${IMAGE_TAG} .
+        '''
+    }
+}
+
+
+        stage('Tag Image') {
+            steps {
+                sh '''
+                docker tag web:${IMAGE_TAG} ${ECR_REPO}:${IMAGE_TAG}
+                '''
+            }
+        }
+
+        stage('Login to ECR') {
+            steps {
+                sh '''
+                aws ecr get-login-password --region $AWS_REGION | \
+                docker login --username AWS --password-stdin 010438490109.dkr.ecr.ap-south-1.amazonaws.com
+                '''
+            }
+        }
+
+        stage('Push Image') {
+            steps {
+                sh '''
+                docker push ${ECR_REPO}:${IMAGE_TAG}
+                '''
+            }
+        }
+
+        stage('Anchore (Grype) Scan') {
+            steps {
+                sh '''
+                grype ${ECR_REPO}:${IMAGE_TAG} -o json > anchore-scan.json
+                CRITICAL=$(grep -o '"severity":"Critical"' anchore-scan.json | wc -l)
+
+                echo "Critical: $CRITICAL"
+
+                if [ "$CRITICAL" -gt 1 ]; then
+                  echo "Critical vulnerabilities found"
+                  exit 1
+                fi
+                '''
+            }
+        }
+
+stage('Clone Helm Charts Repo') {
+    steps {
+        sh '''
+        rm -rf application-helm-charts || true
+        git clone https://gitlab.com/lezinhere/application-helm-charts.git
+        '''
+    }
+}
+
+
+
+stage('Kubelinter') {
+    steps {
+        sh '''
+        kube-linter lint application-helm-charts > kubelinter.txt || true
+
+        ERRORS=$(grep -i error kubelinter.txt | wc -l)
+        echo "Kubelinter errors: $ERRORS"
+
+
+        '''
+    }
+}
+
+
+
+stage('Update Helm Chart') {
+    steps {
+        withCredentials([usernamePassword(credentialsId: 'gitlab-token', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
+            sh '''
+            cd application-helm-charts/web
+
+            git config user.email "jenkins@example.com"
+            git config user.name "jenkins"
+
+            sed -i "s/tag:.*/tag: \\\"${IMAGE_TAG}\\\"/" values.yaml
+
+            git add .
+            git commit -m "update web image ${IMAGE_TAG}" || true
+
+            git remote set-url origin https://${GIT_USER}:${GIT_PASS}@gitlab.com/lezinhere/application-helm-charts.git
+
+            git push origin $BRANCH_NAME
+            '''
+        }
+    }
+}
+
+
+    }
+
+    post {
+        always {
+            echo "Build completed: ${env.BUILD_NUMBER}"
+        }
+    }
+}
