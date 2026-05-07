@@ -1,8 +1,8 @@
-\# Enterprise DevSecOps GitOps Platform on AWS EKS
+# Enterprise DevSecOps GitOps Platform on AWS EKS
 
 
 
-\## Overview
+## Overview
 
 
 
@@ -14,11 +14,11 @@ The platform was designed and implemented to automate application build, securit
 
 
 
-\---
+---
 
 
 
-\# Architecture Diagram
+# Architecture Diagram
 
 
 <img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/97d9f004-12a5-4593-939b-d0e0a289dc7e" />
@@ -26,43 +26,42 @@ The platform was designed and implemented to automate application build, securit
 
 
 
-\# Project Highlights
+# Project Highlights
 
 
 
-\* Complete DevSecOps CI/CD implementation
+* Complete DevSecOps CI/CD implementation
 
-\* GitOps-based deployment using ArgoCD
+* GitOps-based deployment using ArgoCD
 
-\* Kubernetes deployment on Amazon EKS
+* Kubernetes deployment on Amazon EKS
 
-\* Dockerized frontend and backend applications
+* Dockerized frontend and backend applications
 
-\* Helm-based Kubernetes packaging
+* Helm-based Kubernetes packaging
 
-\* Security scanning using Trivy
+* Security scanning using Trivy
 
-\* Static code analysis using SonarQube
+* Static code analysis using SonarQube
 
-\* Jenkins multi-stage pipelines
+* Jenkins multi-stage pipelines
 
-\* Environment separation (Dev \& Prod)
+* Environment separation (Dev \& Prod)
 
-\* Monitoring using Prometheus and Grafana
+* Monitoring using Prometheus and Grafana
 
-\* Container image management using Amazon ECR
+* Container image management using Amazon ECR
 
-\* Automated deployments through GitOps workflow
+* Automated deployments through GitOps workflow
 
-\* Namespace-based Kubernetes architecture
-
-
-
-\---
+* Namespace-based Kubernetes architecture
 
 
+---
 
-\# Tech Stack
+
+
+# Tech Stack
 
 
 
@@ -100,15 +99,15 @@ The platform was designed and implemented to automate application build, securit
 
 
 
-\---
+---
 
 
 
-\# Infrastructure Components
+# Infrastructure Components
 
 
 
-\## Jenkins Master
+## Jenkins Master
 
 
 
@@ -116,25 +115,25 @@ Responsible for:
 
 
 
-\* Pipeline execution
+* Pipeline execution
 
-\* Docker image build
+* Docker image build
 
-\* Security scanning
+* Security scanning
+* 
+* SonarQube integration
 
-\* SonarQube integration
+* ECR image push
 
-\* ECR image push
-
-\* Deployment automation
-
-
-
-\---
+* Deployment automation
 
 
 
-\## SonarQube Server
+---
+
+
+
+## SonarQube Server
 
 
 
@@ -142,21 +141,21 @@ Used for:
 
 
 
-\* Static code analysis
+* Static code analysis
 
-\* Code smell detection
+* Code smell detection
 
-\* Security hotspot analysis
+* Security hotspot analysis
 
-\* Quality gate validation
-
-
-
-\---
+* Quality gate validation
 
 
 
-\## Amazon ECR
+---
+
+
+
+## Amazon ECR
 
 
 
@@ -164,21 +163,21 @@ Used as centralized container image registry for:
 
 
 
-\* web-dev
+* web-dev
 
-\* web-prod
+* web-prod
 
-\* api-dev
+* api-dev
 
-\* api-prod
-
-
-
-\---
+* api-prod
 
 
 
-\## Amazon EKS
+---
+
+
+
+## Amazon EKS
 
 
 
@@ -186,21 +185,21 @@ Kubernetes orchestration platform hosting:
 
 
 
-\* Dev namespace
+* Dev namespace
 
-\* Prod namespace
+* Prod namespace
 
-\* Monitoring namespace
+* Monitoring namespace
 
-\* ArgoCD namespace
-
-
-
-\---
+* ArgoCD namespace
 
 
 
-\## ArgoCD GitOps
+---
+
+
+
+## ArgoCD GitOps
 
 
 
@@ -208,13 +207,13 @@ Responsible for:
 
 
 
-\* Continuous synchronization
+* Continuous synchronization
 
-\* Git-based deployment automation
+* Git-based deployment automation
 
-\* Drift detection
+* Drift detection
 
-\* Declarative Kubernetes delivery
+* Declarative Kubernetes delivery
 
 
 
@@ -222,7 +221,7 @@ Responsible for:
 
 
 
-\## Helm Charts
+## Helm Charts
 
 
 
@@ -230,23 +229,22 @@ Used for:
 
 
 
-\* Kubernetes manifest templating
+* Kubernetes manifest templating
 
-\* Environment-specific configuration
+* Environment-specific configuration
 
-\* Version-controlled deployments
-
-
-
-\---
+* Version-controlled deployments
 
 
-
-\## Monitoring Stack
+---
 
 
 
-\### Prometheus
+## Monitoring Stack
+
+
+
+### Prometheus
 
 
 
@@ -260,27 +258,27 @@ Used for:
 
 
 
-\### Grafana
+### Grafana
 
 
 
-\* Visualization dashboards
+* Visualization dashboards
 
-\* Cluster monitoring
+* Cluster monitoring
 
-\* Infrastructure insights
-
-
-
-\---
+* Infrastructure insights
 
 
 
-\# CI/CD Workflow
+---
 
 
 
-\## Step 1 — Developer Push
+# CI/CD Workflow
+
+
+
+## Step 1 — Developer Push
 
 
 
@@ -288,11 +286,11 @@ Developer pushes code changes into GitLab repositories.
 
 
 
-\---
+---
 
 
 
-\## Step 2 — Jenkins Pipeline Trigger
+## Step 2 — Jenkins Pipeline Trigger
 
 
 
@@ -304,29 +302,29 @@ Pipeline stages:
 
 
 
-1\. Git Checkout
+1. Git Checkout
 
-2\. Dependency Installation
+2. Dependency Installation
 
-3\. SonarQube Analysis
+3. SonarQube Analysis
 
-4\. Trivy Security Scan
+4. Trivy Security Scan
 
-5\. Docker Image Build
+5. Docker Image Build
 
-6\. Docker Push to Amazon ECR
+6. Docker Push to Amazon ECR
 
-7\. Helm Repository Update
+7. Helm Repository Update
 
-8\. GitOps Deployment Trigger
-
-
-
-\---
+8. GitOps Deployment Trigger
 
 
 
-\## Step 3 — GitOps Deployment
+---
+
+
+
+## Step 3 — GitOps Deployment
 
 
 
@@ -338,16 +336,15 @@ Whenever image tag or manifests change:
 
 
 
-\* ArgoCD syncs automatically
+* ArgoCD syncs automatically
 
-\* Kubernetes deployment updates
+* Kubernetes deployment updates
 
-\* New pods are rolled out
+* New pods are rolled out
 
 
 
-\---
-
+---
 
 
 \## Step 4 — Monitoring
@@ -358,13 +355,13 @@ Prometheus collects metrics from:
 
 
 
-\* Kubernetes cluster
+* Kubernetes cluster
 
-\* Nodes
+* Nodes
 
-\* Pods
+* Pods
 
-\* Applications
+* Applications
 
 
 
@@ -372,39 +369,38 @@ Grafana visualizes all collected metrics.
 
 
 
-\---
+---
 
 
 
-\# Kubernetes Resources Used
+# Kubernetes Resources Used
 
 
 
-\* Deployments
+* Deployments
 
-\* Services
+* Services
 
-\* Namespaces
+* Namespaces
+* Pods
 
-\* Pods
+* ReplicaSets
 
-\* ReplicaSets
+* Configurations through Helm values
 
-\* Configurations through Helm values
-
-\* ApplicationSets in ArgoCD
-
-
-
-\---
+* ApplicationSets in ArgoCD
 
 
 
-\# Security Implementation
+---
 
 
 
-\## Trivy
+# Security Implementation
+
+
+
+## Trivy
 
 
 
@@ -412,19 +408,19 @@ Implemented for:
 
 
 
-\* Container vulnerability scanning
+* Container vulnerability scanning
 
-\* Dependency scanning
+* Dependency scanning
 
-\* Security issue identification
-
-
-
-\---
+* Security issue identification
 
 
 
-\## SonarQube
+---
+
+
+
+## SonarQube
 
 
 
@@ -436,15 +432,14 @@ Implemented for:
 
 \* Security hotspot detection
 
-\* Code quality enforcement
+* Code quality enforcement
+
+
+---
 
 
 
-\---
-
-
-
-\# Project Structure
+# Project Structure
 
 
 
@@ -488,11 +483,11 @@ project/
 
 
 
-\---
+---
 
 
 
-\# Docker Multi-Stage Build
+# Docker Multi-Stage Build
 
 
 
@@ -500,7 +495,7 @@ The frontend application uses multi-stage Docker builds.
 
 
 
-\## Why Multi-Stage Builds?
+## Why Multi-Stage Builds?
 
 
 
@@ -508,15 +503,14 @@ Benefits:
 
 
 
-\* Smaller final image size
+* Smaller final image size
+* Cleaner runtime container
 
-\* Cleaner runtime container
+* Faster deployments
 
-\* Faster deployments
+* Improved security
 
-\* Improved security
-
-\* Optimized production containers
+* Optimized production containers
 
 
 
@@ -628,7 +622,7 @@ Nginx image used to:
 
 
 
-\# Author
+# Author
 
 
 
@@ -639,12 +633,11 @@ Lezin VM
 AWS \& DevOps Engineer
 
 
+* AWS Certified Solutions Architect – Associate
 
-\* AWS Certified Solutions Architect – Associate
+* Cloud \& DevOps Community Lead
 
-\* Cloud \& DevOps Community Lead
-
-\* DevOps Enthusiast
+* DevOps Enthusiast
 
 
 
